@@ -8,7 +8,6 @@ data = {"buildings" : ret.json()["buildings"], "subjects" : ret.json()["subjects
 
 dataFile = open("data.dat", "w")
 
-json.dump(data, dataFile, sort_keys=True, indent=4, separators=(',', ': '))
+json.dump(data, dataFile, indent=4, separators=(',', ': '))
 
 dataFile.close()
-

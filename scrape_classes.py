@@ -7,7 +7,7 @@ dataInFile.close()
 
 url = "http://sis.rutgers.edu/soc/courses.json"
 specs = {"semester" : "92016", "campus" : "NB", "level" : "U", "subject" : ""}
-busch = {}
+busch = []
 livi = []
 cookdoug = []
 collegeave = []
@@ -24,7 +24,8 @@ for subj in dataIn["subjects"]:
 				if k["meetingModeCode"] == "90" or k["meetingModeCode"] == "19" or k["meetingModeCode"] == "03" or k["startTime"] == None or k["buildingCode"] == None or k["roomNumber"] == None:
 					continue
 				c = {}
-				c["courseNum"] = i["courseNumber"]
+				c["department"] = subj["description"]
+				c["courseNum"] = subj["code"] + ":" + i["courseNumber"]
 				if i["expandedTitle"]:
 					c["title"] = i["expandedTitle"].strip()
 				else:
@@ -40,9 +41,7 @@ for subj in dataIn["subjects"]:
 				if k["campusLocation"] == "1":
 					collegeave.insert(0,c)
 				elif k["campusLocation"] == "2":
-					if(not c["building"] in busch):
-						busch[c["building"]] = []
-					busch[c["building"]].insert(0,c)
+					busch.insert(0,c)
 				elif k["campusLocation"] == "3":
 					livi.insert(0,c)
 				elif k["campusLocation"] == "4":
@@ -53,10 +52,15 @@ for subj in dataIn["subjects"]:
 					print(k["campusLocation"] + " " +  k["campusName"] + " " + j["index"])
 					assert(False)
 
-data = {"COLLEGE AVENUE" : collegeave, "LIVINGSTON" : livi, "DOUGLAS/COOK" : cookdoug, "BUSCH" : busch}
+busch = sorted(busch, key=lambda k: k['time'])
+livi = sorted(livi, key=lambda k: k['time'])
+cookdoug = sorted(cookdoug, key=lambda k: k['time'])
+collegeave = sorted(collegeave, key=lambda k: k['time'])
+
+data = {1 : collegeave, 3: livi, 4 : cookdoug, 2: busch}
 
 dataFile = open("classes.dat", "w")
 
-json.dump(data, dataFile, sort_keys=True, indent=4, separators=(',', ': '))
+json.dump(data, dataFile, indent=4, separators=(',', ': '))
 
 dataFile.close()
