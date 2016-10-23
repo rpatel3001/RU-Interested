@@ -1,3 +1,4 @@
 *.dat
 run
 env/*
+__pycache__/*

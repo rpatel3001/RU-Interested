@@ -1,7 +1,11 @@
-<!doctype html>
-<title>Hello from Flask</title>
-{% if name %}
-  <h1>Hello {{ name }}!</h1>
-{% else %}
-  <h1>Hello, World!</h1>
-{% endif %}
+{% extends "base.html" %}
+
+{% block content %}
+<form action="" method="post" name="submit">
+	<p>
+    	{{ form.campus(size=4, **{"onchange":"window.location.reload(false);"}) }}
+    	{{ form.building(**{"onchange":"window.location.reload(false);"})}}
+	</p>
+	<p><input type="submit" value="Go"></p>
+</form>
+{% endblock %}

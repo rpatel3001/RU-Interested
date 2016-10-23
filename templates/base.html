@@ -1,0 +1,24 @@
+<html>
+  <head>
+    {% if title %}
+    <title>{{ title }} - hi</title>
+    {% else %}
+    <title>hi</title>
+    {% endif %}
+  </head>
+  <body>
+    <div><a href="/">Home</a></div>
+    <div><a href="/submit">Form</a></div>
+    <hr>
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul>
+        {% for message in messages %}
+            <li>{{ message }} </li>
+        {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+  </body>
+</html>
