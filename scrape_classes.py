@@ -38,6 +38,8 @@ for subj in dataIn["subjects"]:
 				if temp < 1200 and k["pmCode"] == "P":
 					temp += 1200
 				c["time"] = temp
+				temp = str(temp)
+				c["prettyTime"] = temp[:-2] + ":" + temp[-2:]
 				if k["campusLocation"] == "1":
 					collegeave.insert(0,c)
 				elif k["campusLocation"] == "2":

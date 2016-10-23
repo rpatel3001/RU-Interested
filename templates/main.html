@@ -6,22 +6,26 @@
     <div><a href="https://github.com/rpatel3001/RU-Interested">source</a></div>
     <hr>
     <form action="" method="post" name="submit">
-  <p>
-      {{ form.campus(size=5, **{"style":"vertical-align:top;", "onchange":"document.submit.submit();"})}}
-      {{ form.building(size=10,**{"style":"vertical-align:top;", "onchange":"document.submit.submit();"})}}
-  </p>
-  <p><input type="submit" value="Go"></p>
+      <p>
+        {{ form.campus(size=1, **{"style":"vertical-align:top;", "onchange":"document.submit.submit();"})}}
+        {{ form.day(size=1, **{"style":"vertical-align:top;", "onchange":"document.submit.submit();"})}}
+        {{ form.startTime(size=1, **{"style":"vertical-align:top;", "onchange":"document.submit.submit();"})}}
+        {{ form.endTime(size=1, **{"style":"vertical-align:top;", "onchange":"document.submit.submit();"})}}
+        {{ form.department(size=10,**{"style":"vertical-align:top;", "onchange":"document.submit.submit();"})}}
+        {{ form.building(size=10,**{"style":"vertical-align:top;", "onchange":"document.submit.submit();"})}}
+      </p>
     </form>
     <table>
-    {% for dict_item in results %}
-       {% for key, value in dict_item.items() %}
-       <tr>
-          <td>{{key}}</td>
-          <td>{{value}}</td>
-       </tr>
-       {% endfor %}
-       <tr height="20"></tr>
-    {% endfor %}
+      {% for course in results %}
+         <tr>
+            <td style="padding:20;">{{course["title"]}}</td>
+            <td style="padding:20;">{{course["courseNum"]}}</td>
+            <td style="padding:20;">{{course["prettyTime"]}}</td>
+            <td style="padding:20;">{{course["building"]}}:{{course["room"]}}</td>
+            <td style="padding:20;">{{course["department"]}}</td>
+         </tr>
+         <tr height="20"></tr>
+      {% endfor %}
     </table>
   </body>
 </html>
