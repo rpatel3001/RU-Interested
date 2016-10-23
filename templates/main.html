@@ -1,23 +1,27 @@
-{% include "base.html" %}
-
-{% block content %}
-<form action="" method="post" name="submit">
-	<p style="vertical-align:middle;">
-    	{{ form.campus(size=4, **{"onchange":"document.submit.submit();"})}}
-    	{{ form.building(size=10,**{"onchange":"document.submit.submit();"})}}
-	</p>
-	<p><input type="submit" value="Go"></p>
-</form>
-{% endblock %}
-
-{%block results %}
-
-{% for dict_item in results %}
-   {% for key, value in dict_item.items() %}
-      Key: {{key}}
-      Value: {{value}} <br>
-   {% endfor %}
-   <br>
-{% endfor %}
-
-{% endblock %}
+<html>
+  <head>
+    <title>RU Interested</title>
+  </head>
+  <body>
+    <div><a href="https://github.com/rpatel3001/RU-Interested">source</a></div>
+    <hr>
+    <form action="" method="post" name="submit">
+  <p>
+      {{ form.campus(size=5, **{"style":"vertical-align:top;", "onchange":"document.submit.submit();"})}}
+      {{ form.building(size=10,**{"style":"vertical-align:top;", "onchange":"document.submit.submit();"})}}
+  </p>
+  <p><input type="submit" value="Go"></p>
+    </form>
+    <table>
+    {% for dict_item in results %}
+       {% for key, value in dict_item.items() %}
+       <tr>
+          <td>{{key}}</td>
+          <td>{{value}}</td>
+       </tr>
+       {% endfor %}
+       <tr height="20"></tr>
+    {% endfor %}
+    </table>
+  </body>
+</html>
