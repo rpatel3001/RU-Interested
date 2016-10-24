@@ -8,3 +8,4 @@ Got a long wait between classes? See if there's an interesting lecture going on 
 3. python scrape_data.py
 4. python scrape_classes.py
 5. ./run
+6. go to localhost:5000 in a browser
