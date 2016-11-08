@@ -1,6 +1,15 @@
 import json
 import requests
 
+#scrape building and subject code data
+url = "http://sis.rutgers.edu/soc/init.json"
+ret = requests.get(url);
+data = {"buildings" : ret.json()["buildings"], "subjects" : ret.json()["subjects"]}
+dataFile = open("data.dat", "w")
+json.dump(data, dataFile, indent=4, separators=(',', ': '))
+dataFile.close()
+
+#scrape class listings
 dataInFile = open("data.dat", "r")
 dataIn = json.load(dataInFile)
 dataInFile.close()
@@ -58,11 +67,7 @@ busch = sorted(busch, key=lambda k: k['time'])
 livi = sorted(livi, key=lambda k: k['time'])
 cookdoug = sorted(cookdoug, key=lambda k: k['time'])
 collegeave = sorted(collegeave, key=lambda k: k['time'])
-
 data = {1 : collegeave, 3: livi, 4 : cookdoug, 2: busch}
-
 dataFile = open("classes.dat", "w")
-
 json.dump(data, dataFile, indent=4, separators=(',', ': '))
-
 dataFile.close()
