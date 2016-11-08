@@ -24,7 +24,7 @@ def submit():
 	form = SpecifierForm()
 	classes = [x for x in classesIn[form.campus.data]
 				if x["time"] >= int(form.startTime.data)
-					and x["time"] < int(form.endTime.data)
+					and x["time"] <= int(form.endTime.data)
 					and x["day"] == form.day.data]
 	form.department.choices = set([(x["courseNum"][:3], [y["description"] for y in dataIn["subjects"] if y["code"] == x["courseNum"][:3]][0]) for x in classes])
 	classes = [x for x in classes if (form.department.data == None or form.department.data == [] or x["courseNum"][:3] in form.department.data)]

@@ -1,3 +1,4 @@
+source env/bin/activate
 export FLASK_DEBUG=1
 export FLASK_APP=serve.py
 python -m flask run
