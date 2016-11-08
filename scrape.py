@@ -39,8 +39,8 @@ for b in initData["buildings"]:
 conn.commit()
 
 cur.execute("TRUNCATE TABLE subjects;")
-for subj in initData["subjects"]:
-	cur.execute("INSERT INTO subjects (name,code) VALUES (%s, %s)", (subj["description"], subj["code"]))
+for subj in initData["subjects"][0:10]:
+	cur.execute("INSERT INTO subjects VALUES (%s, %s)", (subj["description"], subj["code"]))
 	print("Processing " + subj["description"])
 	specs["subject"] = subj["code"]
 	ret = requests.get(url, params=specs);
@@ -86,6 +86,8 @@ for subj in initData["subjects"]:
 					print(k["campusLocation"] + " " +  k["campusName"] + " " + j["index"])
 					assert(False)
 
+conn.commit()
+
 busch = sorted(busch, key=lambda k: k['time'])
 livi = sorted(livi, key=lambda k: k['time'])
 cookdoug = sorted(cookdoug, key=lambda k: k['time'])
@@ -96,7 +98,7 @@ data = {1 : collegeave, 3: livi, 4 : cookdoug, 2: busch}
 cur.execute("TRUNCATE TABLE classes;")
 for d in data:
 	for m in data[d]:
-		cur.execute("INSERT INTO classes (title,room,department,day,time,building,coursenum,campus) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)", (m["title"], m["room"], m["department"], m["day"], m["time"], m["building"], m["courseNum"], m["campus"]))
+		cur.execute("INSERT INTO classes VALUES (%s, %s, %s, %s, %s, %s, %s, %s)", (m["title"], m["room"], m["department"], m["day"], m["time"], m["building"], m["courseNum"], m["campus"]))
 
 conn.commit()
 cur.close()
