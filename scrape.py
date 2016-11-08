@@ -4,10 +4,25 @@ import os
 import psycopg2
 import urllib.parse as urlparse
 
+#init postgresql table
+if os.environ.get('HEROKU'):
+	urlparse.uses_netloc.append("postgres")
+	url = urlparse.urlparse(os.environ["DATABASE_URL"])
+	conn = psycopg2.connect(
+	    database=url.path[1:],
+	    user=url.username,
+	    password=url.password,
+	    host=url.hostname,
+	    port=url.port
+	)
+else:
+	conn = psycopg2.connect("dbname=DATABASE user=postgres")
+cur = conn.cursor()
+
 #scrape building and subject code data
 url = "http://sis.rutgers.edu/soc/init.json"
 ret = requests.get(url);
-data = {"buildings" : ret.json()["buildings"], "subjects" : ret.json()["subjects"]}
+initData = {"buildings" : ret.json()["buildings"], "subjects" : ret.json()["subjects"]}
 
 #scrape class listings
 url = "http://sis.rutgers.edu/soc/courses.json"
@@ -17,7 +32,8 @@ livi = []
 cookdoug = []
 collegeave = []
 
-for subj in data["subjects"]:
+for subj in initData["subjects"]:
+	cur.execute("INSERT INTO subjects (name,code) VALUES (%s, %s)", (subj["description"], subj["code"]))
 	print("Processing " + subj["description"])
 	specs["subject"] = subj["code"]
 	ret = requests.get(url, params=specs);
@@ -69,22 +85,8 @@ cookdoug = sorted(cookdoug, key=lambda k: k['time'])
 collegeave = sorted(collegeave, key=lambda k: k['time'])
 data = {1 : collegeave, 3: livi, 4 : cookdoug, 2: busch}
 
-#init postgresql table
-if os.environ.get('HEROKU'):
-	urlparse.uses_netloc.append("postgres")
-	url = urlparse.urlparse(os.environ["DATABASE_URL"])
-	conn = psycopg2.connect(
-	    database=url.path[1:],
-	    user=url.username,
-	    password=url.password,
-	    host=url.hostname,
-	    port=url.port
-	)
-else:
-	conn = psycopg2.connect("dbname=DATABASE user=postgres")
-cur = conn.cursor()
+#add to database
 cur.execute("TRUNCATE TABLE classes;")
-
 for d in data:
 	for m in data[d]:
 		cur.execute("INSERT INTO classes (title,room,department,day,time,building,coursenum,campus) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)", (m["title"], m["room"], m["department"], m["day"], m["time"], m["building"], m["courseNum"], m["campus"]))
