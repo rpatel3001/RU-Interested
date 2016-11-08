@@ -2,9 +2,9 @@ from flask import Flask, render_template, flash, redirect
 from flask_wtf import FlaskForm
 from wtforms import SelectField, SelectMultipleField
 from wtforms.validators import DataRequired
-from pprint import pprint
 import json
 from datetime import datetime
+import psycopg2
 
 daysOfWeek = ["","M","T","W","TH","F","S"]
 

@@ -1,19 +1,13 @@
 import json
 import requests
+import psycopg2
 
 #scrape building and subject code data
 url = "http://sis.rutgers.edu/soc/init.json"
 ret = requests.get(url);
 data = {"buildings" : ret.json()["buildings"], "subjects" : ret.json()["subjects"]}
-dataFile = open("data.dat", "w")
-json.dump(data, dataFile, indent=4, separators=(',', ': '))
-dataFile.close()
 
 #scrape class listings
-dataInFile = open("data.dat", "r")
-dataIn = json.load(dataInFile)
-dataInFile.close()
-
 url = "http://sis.rutgers.edu/soc/courses.json"
 specs = {"semester" : "92016", "campus" : "NB", "level" : "U", "subject" : ""}
 busch = []
@@ -21,7 +15,7 @@ livi = []
 cookdoug = []
 collegeave = []
 
-for subj in dataIn["subjects"]:
+for subj in data["subjects"]:
 	print("Processing " + subj["description"])
 	specs["subject"] = subj["code"]
 	ret = requests.get(url, params=specs);
@@ -50,12 +44,16 @@ for subj in dataIn["subjects"]:
 				temp = str(temp)
 				c["prettyTime"] = temp[:-2] + ":" + temp[-2:]
 				if k["campusLocation"] == "1":
+					c["campus"] = "College Ave"
 					collegeave.insert(0,c)
 				elif k["campusLocation"] == "2":
+					c["campus"] = "Busch"
 					busch.insert(0,c)
 				elif k["campusLocation"] == "3":
+					c["campus"] = "Livingston"
 					livi.insert(0,c)
 				elif k["campusLocation"] == "4":
+					c["campus"] = "Cook/Douglas"
 					cookdoug.insert(0,c)
 				elif k["campusLocation"] == "5":
 					pass
@@ -71,3 +69,16 @@ data = {1 : collegeave, 3: livi, 4 : cookdoug, 2: busch}
 dataFile = open("classes.dat", "w")
 json.dump(data, dataFile, indent=4, separators=(',', ': '))
 dataFile.close()
+
+#init postgresql table
+conn = psycopg2.connect("dbname=DATABASE user=postgres")
+cur = conn.cursor()
+cur.execute("TRUNCATE TABLE classes;")
+
+for d in data:
+	for m in data[d]:
+		cur.execute("INSERT INTO classes (title,room,department,day,time,building,coursenum,campus) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)", (m["title"], m["room"], m["department"], m["day"], m["time"], m["building"], m["courseNum"], m["campus"]))
+
+conn.commit()
+cur.close()
+conn.close()
