@@ -1,6 +1,8 @@
 import json
 import requests
+import os
 import psycopg2
+import urllib.parse as urlparse
 
 #scrape building and subject code data
 url = "http://sis.rutgers.edu/soc/init.json"
@@ -15,7 +17,7 @@ livi = []
 cookdoug = []
 collegeave = []
 
-for subj in data["subjects"]:
+for subj in data["subjects"][40:42]:
 	print("Processing " + subj["description"])
 	specs["subject"] = subj["code"]
 	ret = requests.get(url, params=specs);
@@ -71,7 +73,18 @@ json.dump(data, dataFile, indent=4, separators=(',', ': '))
 dataFile.close()
 
 #init postgresql table
-conn = psycopg2.connect("dbname=DATABASE user=postgres")
+if os.environ.get('HEROKU'):
+	urlparse.uses_netloc.append("postgres")
+	url = urlparse.urlparse(os.environ["DATABASE_URL"])
+	conn = psycopg2.connect(
+	    database=url.path[1:],
+	    user=url.username,
+	    password=url.password,
+	    host=url.hostname,
+	    port=url.port
+	)
+else:
+	conn = psycopg2.connect("dbname=DATABASE user=postgres")
 cur = conn.cursor()
 cur.execute("TRUNCATE TABLE classes;")
 
