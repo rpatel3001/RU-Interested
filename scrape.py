@@ -39,7 +39,7 @@ for b in initData["buildings"]:
 conn.commit()
 
 cur.execute("TRUNCATE TABLE subjects;")
-for subj in initData["subjects"][0:10]:
+for subj in initData["subjects"]:
 	cur.execute("INSERT INTO subjects VALUES (%s, %s)", (subj["description"], subj["code"]))
 	print("Processing " + subj["description"])
 	specs["subject"] = subj["code"]
@@ -69,16 +69,16 @@ for subj in initData["subjects"][0:10]:
 				temp = str(temp)
 				c["prettyTime"] = temp[:-2] + ":" + temp[-2:]
 				if k["campusLocation"] == "1":
-					c["campus"] = "College Ave"
+					c["campus"] = 1
 					collegeave.insert(0,c)
 				elif k["campusLocation"] == "2":
-					c["campus"] = "Busch"
+					c["campus"] = 2
 					busch.insert(0,c)
 				elif k["campusLocation"] == "3":
-					c["campus"] = "Livingston"
+					c["campus"] = 3
 					livi.insert(0,c)
 				elif k["campusLocation"] == "4":
-					c["campus"] = "Cook/Douglas"
+					c["campus"] = 4
 					cookdoug.insert(0,c)
 				elif k["campusLocation"] == "5":
 					pass
