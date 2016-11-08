@@ -17,7 +17,7 @@ livi = []
 cookdoug = []
 collegeave = []
 
-for subj in data["subjects"][40:42]:
+for subj in data["subjects"]:
 	print("Processing " + subj["description"])
 	specs["subject"] = subj["code"]
 	ret = requests.get(url, params=specs);
@@ -68,9 +68,6 @@ livi = sorted(livi, key=lambda k: k['time'])
 cookdoug = sorted(cookdoug, key=lambda k: k['time'])
 collegeave = sorted(collegeave, key=lambda k: k['time'])
 data = {1 : collegeave, 3: livi, 4 : cookdoug, 2: busch}
-dataFile = open("classes.dat", "w")
-json.dump(data, dataFile, indent=4, separators=(',', ': '))
-dataFile.close()
 
 #init postgresql table
 if os.environ.get('HEROKU'):
