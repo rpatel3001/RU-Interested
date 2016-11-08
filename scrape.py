@@ -32,6 +32,12 @@ livi = []
 cookdoug = []
 collegeave = []
 
+cur.execute("TRUNCATE TABLE buildings;")
+for b in initData["buildings"]:
+	cur.execute("INSERT INTO buildings VALUES (%s, %s, %s)",(b["code"],b["name"],int(b["id"])))
+
+conn.commit()
+
 cur.execute("TRUNCATE TABLE subjects;")
 for subj in initData["subjects"]:
 	cur.execute("INSERT INTO subjects (name,code) VALUES (%s, %s)", (subj["description"], subj["code"]))
