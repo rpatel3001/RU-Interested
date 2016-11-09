@@ -5,31 +5,51 @@ from wtforms.validators import DataRequired
 import json
 from datetime import datetime
 import psycopg2
+import os
+import urllib.parse as urlparse
 
-daysOfWeek = ["","M","T","W","TH","F","S"]
+daysOfWeek = ["M","M","T","W","TH","F","S"]
+
+#init postgresql table
+if os.environ.get('HEROKU'):
+	urlparse.uses_netloc.append("postgres")
+	url = urlparse.urlparse(os.environ["DATABASE_URL"])
+	conn = psycopg2.connect(
+	    database=url.path[1:],
+	    user=url.username,
+	    password=url.password,
+	    host=url.hostname,
+	    port=url.port
+	)
+else:
+	conn = psycopg2.connect("dbname=DATABASE user=postgres")
+
+cur = conn.cursor()
 
 app = Flask(__name__)
 app.secret_key = "dsvasdvavasverbijbiujrenv0982ygf7328ibh"
-dataInFile = open("data.dat", "r")
-dataIn = json.load(dataInFile)
-dataInFile.close()
-print("Data loaded")
-classesInFile = open("classes.dat", "r")
-classesIn = json.load(classesInFile)
-classesInFile.close()
-print("Class lists loaded")
+
+cur.execute("SELECT * FROM subjects")
+temp = cur.fetchall()
+subjects = [dict(zip(("name","code"),t)) for t in temp]
+
+cur.execute("SELECT * FROM buildings")
+temp = cur.fetchall()
+buildings = [dict(zip(("code","name","id"),t)) for t in temp]
 
 @app.route('/', methods=['GET', 'POST'])
 def submit():
 	form = SpecifierForm()
-	classes = [x for x in classesIn[form.campus.data]
-				if x["time"] >= int(form.startTime.data)
-					and x["time"] <= int(form.endTime.data)
-					and x["day"] == form.day.data]
-	form.department.choices = set([(x["courseNum"][:3], [y["description"] for y in dataIn["subjects"] if y["code"] == x["courseNum"][:3]][0]) for x in classes])
+	cur.execute("SELECT * FROM classes WHERE time BETWEEN %s AND %s", (int(form.startTime.data), int(form.endTime.data)))
+	temp = cur.fetchall()
+	classes = [dict(zip(("title","room","department","day","time","building","courseNum","campus"),r)) for r in temp]
+	cur.execute("SELECT DISTINCT s.* FROM subjects s INNER JOIN classes c ON s.code=SUBSTRING(c.coursenum for 3)")
+	temp = cur.fetchall()
+	temp = [dict(zip(("name","code"),t)) for t in temp]
+	form.department.choices = [{t["code"],t["name"]} for t in temp]
 	classes = [x for x in classes if (form.department.data == None or form.department.data == [] or x["courseNum"][:3] in form.department.data)]
-	form.building.choices = [(x["code"], x["name"]) for x in dataIn["buildings"] if x["campus"] == form.campus.data and x["code"] in [x["building"] for x in classes]]
-	classes = [x for x in classes if (form.building.data == None or form.building.data == [] or not (set(form.building.data) < set([z[0] for z in form.building.choices])) or x["building"] in form.building.data)]
+	form.building.choices = [(b["code"], b["name"]) for b in buildings if b["code"] in [x["building"] for x in classes]]
+	classes = [x for x in classes if (form.building.data == None or form.building.data == [] or not (set(form.building.data) <= set([z[0] for z in form.building.choices])) or x["building"] in form.building.data)]
 	return render_template("main.html", form=form, results=classes)
 
 class SpecifierForm(FlaskForm):
@@ -43,9 +63,7 @@ class SpecifierForm(FlaskForm):
 			(2000,"8:00 PM"),(2030,"8:30 PM"),(2100,"9:00 PM"),(2130,"9:30 PM"),(2200,"10:00 PM"),(2230,"10:30 PM")]
 	
 	currDay = daysOfWeek[int(datetime.now().strftime("%w"))]
-	if currDay == "":
-		currDay = "M"
 	currTime = int(int(datetime.now().strftime("%H%M")) / 100) * 100
 	day = SelectField('startTime', choices=[("M", "Monday"),("T", "Tuesday"),("W", "Wednesday"),("TH", "Thursday"),("F", "Friday"),("S","Saturday")], default=currDay);
 	startTime = SelectField('startTime', choices=times, default=currTime);
-	endTime = SelectField('endTime', choices=times, default=currTime+100);
+	endTime = SelectField('endTime', choices=times, default=currTime+130);
