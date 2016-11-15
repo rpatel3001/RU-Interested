@@ -40,7 +40,7 @@ buildings = [dict(zip(("code","name","id"),t)) for t in temp]
 @app.route('/', methods=['GET', 'POST'])
 def submit():
 	form = SpecifierForm()
-	cur.execute("SELECT * FROM classes WHERE time BETWEEN %s AND %s", (int(form.startTime.data), int(form.endTime.data)))
+	cur.execute("SELECT * FROM classes WHERE time BETWEEN %s AND %s AND campus = %s AND day = %s ", (form.startTime.data, form.endTime.data, form.campus.data, form.day.data))
 	temp = cur.fetchall()
 	classes = [dict(zip(("title","room","department","day","time","building","courseNum","campus"),r)) for r in temp]
 	cur.execute("SELECT DISTINCT s.* FROM subjects s INNER JOIN classes c ON s.code=SUBSTRING(c.coursenum for 3)")
