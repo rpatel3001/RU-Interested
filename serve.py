@@ -33,16 +33,19 @@ cur.execute("SELECT * FROM buildings")
 temp = cur.fetchall()
 buildings = [dict(zip(("code","name","id"),t)) for t in temp]
 
+cur.execute("SELECT * FROM subjects")
+temp = cur.fetchall()
+subjects = [dict(zip(("name","code"),t)) for t in temp]
+
 @app.route('/', methods=['GET', 'POST'])
 def submit():
 	form = SpecifierForm()
 	cur.execute("SELECT * FROM classes WHERE time BETWEEN %s AND %s AND campus = %s AND day = %s ", (form.startTime.data, form.endTime.data, form.campus.data, form.day.data))
 	temp = cur.fetchall()
-	classes = [dict(zip(("title","room","department","day","time","building","courseNum","campus"),r)) for r in temp]
-	cur.execute("SELECT DISTINCT s.* FROM subjects s INNER JOIN classes c ON s.code=SUBSTRING(c.coursenum for 3)")
-	temp = cur.fetchall()
-	form.department.choices = [(b,a) for a,b, in temp]
-	classes = [x for x in classes if (form.department.data == None or form.department.data == [] or x["courseNum"][:3] in form.department.data)]
+	classes = [dict(zip(("title","room","department","day","time","building","deptcode","coursecode","campus"),r)) for r in temp]
+	departments = [y["deptcode"] for y in classes]
+	form.department.choices = [(x["code"], x["name"]) for x in subjects if x["code"] in departments]
+	classes = [x for x in classes if (form.department.data == None or form.department.data == [] or x["deptcode"] in form.department.data)]
 	form.building.choices = [(b["code"], b["name"]) for b in buildings if b["code"] in [x["building"] for x in classes]]
 	classes = [x for x in classes if (form.building.data == None or form.building.data == [] or not (set(form.building.data) <= set([z[0] for z in form.building.choices])) or x["building"] in form.building.data)]
 	return render_template("main.html", form=form, results=classes)

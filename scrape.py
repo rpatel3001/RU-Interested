@@ -53,7 +53,8 @@ for subj in initData["subjects"]:
 					continue
 				c = {}
 				c["department"] = subj["description"]
-				c["courseNum"] = subj["code"] + ":" + i["courseNumber"]
+				c["deptcode"] = subj["code"]
+				c["coursecode"] = i["courseNumber"]
 				if i["expandedTitle"]:
 					c["title"] = i["expandedTitle"].strip()
 				else:
@@ -98,7 +99,7 @@ data = {1 : collegeave, 3: livi, 4 : cookdoug, 2: busch}
 cur.execute("TRUNCATE TABLE classes;")
 for d in data:
 	for m in data[d]:
-		cur.execute("INSERT INTO classes VALUES (%s, %s, %s, %s, %s, %s, %s, %s)", (m["title"], m["room"], m["department"], m["day"], m["time"], m["building"], m["courseNum"], m["campus"]))
+		cur.execute("INSERT INTO classes VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)", (m["title"], m["room"], m["department"], m["day"], m["time"], m["building"], m["deptcode"], m["coursecode"], m["campus"]))
 
 conn.commit()
 cur.close()
