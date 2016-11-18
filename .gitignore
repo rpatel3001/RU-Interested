@@ -1,3 +1,4 @@
 *.dat
 env
 __pycache__
+upgrade_pg.sh
