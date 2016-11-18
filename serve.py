@@ -29,10 +29,6 @@ cur = conn.cursor()
 app = Flask(__name__)
 app.secret_key = "dsvasdvavasverbijbiujrenv0982ygf7328ibh"
 
-cur.execute("SELECT * FROM subjects")
-temp = cur.fetchall()
-subjects = [dict(zip(("name","code"),t)) for t in temp]
-
 cur.execute("SELECT * FROM buildings")
 temp = cur.fetchall()
 buildings = [dict(zip(("code","name","id"),t)) for t in temp]
@@ -45,8 +41,7 @@ def submit():
 	classes = [dict(zip(("title","room","department","day","time","building","courseNum","campus"),r)) for r in temp]
 	cur.execute("SELECT DISTINCT s.* FROM subjects s INNER JOIN classes c ON s.code=SUBSTRING(c.coursenum for 3)")
 	temp = cur.fetchall()
-	temp = [dict(zip(("name","code"),t)) for t in temp]
-	form.department.choices = [{t["code"],t["name"]} for t in temp]
+	form.department.choices = [(b,a) for a,b, in temp]
 	classes = [x for x in classes if (form.department.data == None or form.department.data == [] or x["courseNum"][:3] in form.department.data)]
 	form.building.choices = [(b["code"], b["name"]) for b in buildings if b["code"] in [x["building"] for x in classes]]
 	classes = [x for x in classes if (form.building.data == None or form.building.data == [] or not (set(form.building.data) <= set([z[0] for z in form.building.choices])) or x["building"] in form.building.data)]
