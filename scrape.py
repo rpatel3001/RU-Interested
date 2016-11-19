@@ -4,6 +4,8 @@ import os
 import psycopg2
 import urllib.parse as urlparse
 
+print("starting scraper")
+
 #init postgresql table
 if os.environ.get('HEROKU'):
 	urlparse.uses_netloc.append("postgres")
@@ -24,6 +26,8 @@ url = "http://sis.rutgers.edu/soc/init.json"
 ret = requests.get(url);
 initData = {"buildings" : ret.json()["buildings"], "subjects" : ret.json()["subjects"]}
 
+print("retreieved general info json")
+
 #scrape class listings
 url = "http://sis.rutgers.edu/soc/courses.json"
 specs = {"semester" : "92016", "campus" : "NB", "level" : "U", "subject" : ""}
@@ -37,6 +41,8 @@ for b in initData["buildings"]:
 	cur.execute("INSERT INTO buildings VALUES (%s, %s, %s)",(b["code"],b["name"],int(b["id"])))
 
 conn.commit()
+
+print("added general info to database")
 
 cur.execute("TRUNCATE TABLE subjects;")
 for subj in initData["subjects"]:
@@ -89,6 +95,8 @@ for subj in initData["subjects"]:
 
 conn.commit()
 
+print("done scsraping")
+
 busch = sorted(busch, key=lambda k: k['time'])
 livi = sorted(livi, key=lambda k: k['time'])
 cookdoug = sorted(cookdoug, key=lambda k: k['time'])
@@ -104,3 +112,5 @@ for d in data:
 conn.commit()
 cur.close()
 conn.close()
+
+print("done storing")
