@@ -26,7 +26,7 @@ url = "http://sis.rutgers.edu/soc/init.json"
 ret = requests.get(url);
 initData = {"buildings" : ret.json()["buildings"], "subjects" : ret.json()["subjects"]}
 
-print("retreieved general info json")
+print("retrieved general info json")
 
 #scrape class listings
 url = "http://sis.rutgers.edu/soc/courses.json"
