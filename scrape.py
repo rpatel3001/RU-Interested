@@ -95,7 +95,7 @@ for subj in initData["subjects"]:
 
 conn.commit()
 
-print("done scsraping")
+print("done scraping")
 
 busch = sorted(busch, key=lambda k: k['time'])
 livi = sorted(livi, key=lambda k: k['time'])
