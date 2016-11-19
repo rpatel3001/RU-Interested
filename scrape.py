@@ -70,16 +70,16 @@ for subj in initData["subjects"]:
 				temp = str(temp)
 				c["prettyTime"] = temp[:-2] + ":" + temp[-2:]
 				if k["campusLocation"] == "1":
-					c["campus"] = 1
+					c["campus"] = "CAC"
 					collegeave.insert(0,c)
 				elif k["campusLocation"] == "2":
-					c["campus"] = 2
+					c["campus"] = "BUS"
 					busch.insert(0,c)
 				elif k["campusLocation"] == "3":
-					c["campus"] = 3
+					c["campus"] = "LIV"
 					livi.insert(0,c)
 				elif k["campusLocation"] == "4":
-					c["campus"] = 4
+					c["campus"] = "CD"
 					cookdoug.insert(0,c)
 				elif k["campusLocation"] == "5":
 					pass

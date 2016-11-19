@@ -1,8 +1,7 @@
-from flask import Flask, render_template, flash, redirect
+from flask import Flask, render_template, flash, redirect, request, jsonify
 from flask_wtf import FlaskForm
 from wtforms import SelectField, SelectMultipleField
 from wtforms.validators import DataRequired
-import json
 from datetime import datetime
 import psycopg2
 import os
@@ -37,6 +36,17 @@ cur.execute("SELECT * FROM subjects")
 temp = cur.fetchall()
 subjects = [dict(zip(("name","code"),t)) for t in temp]
 
+@app.route('/api/<string:campus>/<string:day>/<int:start>/<int:end>', methods=['GET'])
+def data(campus, day, start, end):
+	reqbuildings = request.args.get('buildings', default="").split(',')
+	reqsubjects = request.args.get('subjects', default="").split(',')
+
+	cur.execute("SELECT * FROM classes WHERE time BETWEEN %s AND %s AND campus = %s AND day = %s ", (start, end, campus, day))
+	temp = cur.fetchall()
+	classes = [dict(zip(("title","room","department","day","time","building","deptcode","coursecode","campus"),r)) for r in temp]
+	classes = [x for x in classes if (x["deptcode"] in reqsubjects or reqsubjects == ['']) and (x["building"] in reqbuildings or reqbuildings == [''])]
+	return jsonify(classes)
+
 @app.route('/', methods=['GET', 'POST'])
 def submit():
 	form = SpecifierForm()
@@ -51,7 +61,7 @@ def submit():
 	return render_template("main.html", form=form, results=classes)
 
 class SpecifierForm(FlaskForm):
-	campus = SelectField('campus', choices=[(1, "College Avenue"), (2, "Busch"), (3, "Livingston"), (4, "Cook/Douglas")], default=1)
+	campus = SelectField('campus', choices=[("CAC", "College Avenue"), ("BUS", "Busch"), ("LIV", "Livingston"), ("CD", "Cook/Douglas")], default=1)
 	building = SelectMultipleField("building")
 	department = SelectMultipleField("department")
 	times = [(800,"8:00 AM"),(830,"8:30 AM"),(900,"9:00 AM"),(930,"9:30 AM"),(1000,"10:00 AM"),(1030,"10:30 AM"),
