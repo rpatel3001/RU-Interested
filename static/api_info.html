@@ -10,7 +10,7 @@
   <body>
     <h1>API Information</h1>
     <p>
-      Access the api at /api/CAMPUS/DAY/START/END?buildings=BUILDINGS&subjects=SUBJECTS</br>
+      Access the api at /api/classes/CAMPUS/DAY/START/END?buildings=BUILDINGS&subjects=SUBJECTS</br>
     </p>
     <dl>
       <dt>CAMPUS:</dt>
@@ -28,9 +28,11 @@
       <dt>START/END</dt>
         <dd>4 digit number representing a 24-hour time in the format HHMM</dd>
       <dt>BUILDINGS (optional)</dt>
-        <dd>comma separated list of 3 character building codes</dd>
+        <dd>comma separated list of 2 or3 character building codes</dd>
+        <dd>full list found at /api/buildings</dd>
       <dt>SUBJECTS (optional)</dt>
         <dd>comma separated list of 3 digit department codes</dd>
+        <dd>full list found at /api/subjects</dd>
     </dl>
   </body>
 </html>
