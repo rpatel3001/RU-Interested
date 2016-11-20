@@ -36,40 +36,51 @@ cur.execute("SELECT * FROM subjects")
 temp = cur.fetchall()
 subjects = [dict(zip(("name","code"),t)) for t in temp]
 
-def get_classes(campus, day, start, end, reqb, reqs):
+def get_classes(campus, day, start, end, reqb=[''], reqs=['']):
 	cur.execute("SELECT * FROM classes WHERE time BETWEEN %s AND %s AND campus = %s AND day = %s ", (start, end, campus, day))
 	temp = cur.fetchall()
 	classes = [dict(zip(("title","room","department","day","time","building","deptcode","coursecode","campus"),r)) for r in temp]
-	classes = [x for x in classes if (x["deptcode"] in reqs or reqs == ['']) and (x["building"] in reqb or reqb == [''])]
+	classes = [x for x in classes if (reqs == [''] or x["deptcode"] in reqs) and (reqb == [''] or x["building"] in reqb)]
 	return classes
+
+def get_buildings():
+	return buildings
+
+def get_subjects():
+	return subjects
 
 @app.route('/api')
 def info():
 	return send_file('static/api_info.html')
 
 @app.route('/api/buildings')
-def get_buildings():
-	return jsonify(buildings)
+def send_buildings():
+	return jsonify(get_buildings())
 
 @app.route('/api/subjects')
-def get_subjects():
-	return jsonify(subjects)
+def send_subjects():
+	return jsonify(get_subjects())
 
 @app.route('/api/classes/<string:campus>/<string:day>/<int:start>/<int:end>', methods=['GET'])
-def data(campus, day, start, end):
+def send_classes(campus, day, start, end):
 	return jsonify(get_classes(campus, day, start, end, request.args.get('buildings', default="").split(','), request.args.get('subjects', default="").split(',')))
 
 @app.route('/', methods=['GET', 'POST'])
 def submit():
 	form = SpecifierForm()
 	if not form.building.data:
-		form.building.data = []
+		form.building.data = ['']
 	if not form.department.data:
-		form.department.data = []
-	return render_template("main.html", form=form, results=get_classes(form.campus.data, form.day.data, form.startTime.data, form.endTime.data, ",".join(form.building.data), ",".join(form.department.data)))
+		form.department.data = ['']
+	classes = get_classes(form.campus.data, form.day.data, form.startTime.data, form.endTime.data)
+	form.department.choices = [(x["code"], x["name"]) for x in subjects if x["code"] in [y["deptcode"] for y in classes]]
+	classes = [x for x in classes if form.department.data == [''] or x["deptcode"] in form.department.data]
+	form.building.choices = [(b["code"], b["name"]) for b in buildings if b["code"] in [x["building"] for x in classes]]
+	classes = [x for x in classes if form.building.data == [''] or x["building"] in form.building.data]
+	return render_template("main.html", form=form, results=classes)
 
 class SpecifierForm(FlaskForm):
-	campus = SelectField('campus', choices=[("CAC", "College Avenue"), ("BUS", "Busch"), ("LIV", "Livingston"), ("CD", "Cook/Douglas")], default=1)
+	campus = SelectField('campus', choices=[("CAC", "College Avenue"), ("BUS", "Busch"), ("LIV", "Livingston"), ("CD", "Cook/Douglas")], default='CAC')
 	building = SelectMultipleField("building")
 	department = SelectMultipleField("department")
 	times = [(800,"8:00 AM"),(830,"8:30 AM"),(900,"9:00 AM"),(930,"9:30 AM"),(1000,"10:00 AM"),(1030,"10:30 AM"),
