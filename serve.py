@@ -41,6 +41,10 @@ def get_classes(campus, day, start, end, reqb=[''], reqs=['']):
 	temp = cur.fetchall()
 	classes = [dict(zip(("title","room","department","day","time","building","deptcode","coursecode","campus"),r)) for r in temp]
 	classes = [x for x in classes if (reqs == [''] or x["deptcode"] in reqs) and (reqb == [''] or x["building"] in reqb)]
+	for c in classes:
+		if c["time"] > 1300:
+			c["time"] -= 1200
+		c["time"] = str(c["time"])
 	return classes
 
 def get_buildings():

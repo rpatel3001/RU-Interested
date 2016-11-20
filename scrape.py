@@ -21,6 +21,10 @@ else:
 	conn = psycopg2.connect("dbname=DATABASE user=postgres")
 cur = conn.cursor()
 
+cur.execute("create table if not exists buildings (code text, name text, id int)")
+cur.execute("create table if not exists subjects(name text,code text)")
+cur.execute("create table if not exists classes (title text, room text, department text, day text, time integer, building text, deptcode text, coursecode text, campus text)")
+
 #scrape building and subject code data
 url = "http://sis.rutgers.edu/soc/init.json"
 ret = requests.get(url);
