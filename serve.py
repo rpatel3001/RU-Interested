@@ -43,8 +43,11 @@ def get_classes(campus, day, start, end, reqb=[''], reqs=['']):
 	classes = [x for x in classes if (reqs == [''] or x["deptcode"] in reqs) and (reqb == [''] or x["building"] in reqb)]
 	for c in classes:
 		if c["time"] > 1300:
-			c["time"] -= 1200
-		c["time"] = str(c["time"])
+			c["time"] = str(c["time"]-1200)
+			c["time"] = c["time"][:-2] + ":" + c["time"][-2:] + " PM"
+		else:
+			c["time"] = str(c["time"])
+			c["time"] = c["time"][:-2] + ":" + c["time"][-2:] + " AM"
 	return classes
 
 def get_buildings():
