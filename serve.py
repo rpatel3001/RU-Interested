@@ -1,4 +1,4 @@
-from flask import Flask, render_template, flash, redirect, request, jsonify
+from flask import *
 from flask_wtf import FlaskForm
 from wtforms import SelectField, SelectMultipleField
 from wtforms.validators import DataRequired
@@ -35,6 +35,10 @@ buildings = [dict(zip(("code","name","id"),t)) for t in temp]
 cur.execute("SELECT * FROM subjects")
 temp = cur.fetchall()
 subjects = [dict(zip(("name","code"),t)) for t in temp]
+
+@app.route('/api')
+def info():
+	return send_file('static/api_info.html')
 
 @app.route('/api/<string:campus>/<string:day>/<int:start>/<int:end>', methods=['GET'])
 def data(campus, day, start, end):
