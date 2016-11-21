@@ -87,6 +87,7 @@ for subj in subjects:
 			if j["campusCode"] == "OB":
 				continue
 			for k in j["meetingTimes"]:
+				print(k)
 				if k["meetingModeCode"] == "90" or k["meetingModeCode"] == "19" or k["meetingModeCode"] == "03" \
 				  or k["startTime"] == None or k["buildingCode"] == None or k["roomNumber"] == None \
 				  or k["buildingCode"] + '-' + k["roomNumber"] not in roomcodes:
