@@ -28,13 +28,15 @@ cur = conn.cursor()
 app = Flask(__name__)
 app.secret_key = "dsvasdvavasverbijbiujrenv0982ygf7328ibh"
 
-cur.execute("SELECT * FROM buildings")
+cur.execute("SELECT * FROM rooms")
 temp = cur.fetchall()
-buildings = [dict(zip(("code","name","id"),t)) for t in temp]
+rooms = [dict(zip(("building","campus","code", "capacity", "bcode"),t)) for t in temp]
+buildings = set([(x["building"], x["bcode"]) for x in rooms])
+buildings = [{"name":x[0], "code":x[1]} for x in buildings]
 
-cur.execute("SELECT * FROM subjects")
+cur.execute("SELECT * FROM departments")
 temp = cur.fetchall()
-subjects = [dict(zip(("name","code"),t)) for t in temp]
+departments = [dict(zip(("name","code"),t)) for t in temp]
 
 def get_classes(campus, day, start, end, reqb=[''], reqs=['']):
 	cur.execute("SELECT * FROM classes WHERE time BETWEEN %s AND %s AND campus = %s AND day = %s ", (start, end, campus, day))
@@ -53,8 +55,8 @@ def get_classes(campus, day, start, end, reqb=[''], reqs=['']):
 def get_buildings():
 	return buildings
 
-def get_subjects():
-	return subjects
+def get_departments():
+	return departments
 
 @app.route('/api')
 def info():
@@ -64,13 +66,13 @@ def info():
 def send_buildings():
 	return jsonify(get_buildings())
 
-@app.route('/api/subjects')
-def send_subjects():
-	return jsonify(get_subjects())
+@app.route('/api/departments')
+def send_departments():
+	return jsonify(get_departments())
 
 @app.route('/api/classes/<string:campus>/<string:day>/<int:start>/<int:end>', methods=['GET'])
 def send_classes(campus, day, start, end):
-	return jsonify(get_classes(campus, day, start, end, request.args.get('buildings', default="").split(','), request.args.get('subjects', default="").split(',')))
+	return jsonify(get_classes(campus, day, start, end, request.args.get('buildings', default="").split(','), request.args.get('departments', default="").split(',')))
 
 @app.route('/', methods=['GET', 'POST'])
 def submit():
@@ -80,7 +82,7 @@ def submit():
 	if not form.department.data:
 		form.department.data = ['']
 	classes = get_classes(form.campus.data, form.day.data, form.startTime.data, form.endTime.data)
-	form.department.choices = [(x["code"], x["name"]) for x in subjects if x["code"] in [y["deptcode"] for y in classes]]
+	form.department.choices = [(x["code"], x["name"]) for x in departments if x["code"] in [y["deptcode"] for y in classes]]
 	classes = [x for x in classes if form.department.data == [''] or x["deptcode"] in form.department.data]
 	form.building.choices = [(b["code"], b["name"]) for b in buildings if b["code"] in [x["building"] for x in classes]]
 	classes = [x for x in classes if form.building.data == [''] or x["building"] in form.building.data]

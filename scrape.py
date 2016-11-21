@@ -30,7 +30,7 @@ cur = conn.cursor()
 
 
 print('creating tables')
-cur.execute("create table if not exists rooms (building text, campus text, code text, capacity int)")
+cur.execute("create table if not exists rooms (building text, campus text, buildingcode text, roomnum text, capacity int)")
 cur.execute("create table if not exists departments(name text,code text)")
 cur.execute("create table if not exists classes (title text, room text, department text, day text, time integer, building text, deptcode text, coursecode text, campus text)")
 
@@ -54,9 +54,9 @@ roomcodes=[]
 cur.execute('TRUNCATE TABLE rooms')
 for i in range(len(rooms)):
 	building = max(ids, key=lambda x: strdist(x[1], rooms[i][0]))
-	res = (rooms[i][0], building[2].replace('/', ''), building[0]+'-'+rooms[i][1], rooms[i][3])
-	roomcodes.append(res[2])
-	cur.execute("INSERT INTO rooms VALUES (%s, %s, %s, %s)", res)
+	res = (rooms[i][0], building[2].replace('/', ''), building[0], rooms[i][1], rooms[i][3])
+	roomcodes.append(res[2] + '-' + res[3])
+	cur.execute("INSERT INTO rooms VALUES (%s, %s, %s, %s, %s)", res)
 conn.commit()
 
 
@@ -87,7 +87,6 @@ for subj in subjects:
 			if j["campusCode"] == "OB":
 				continue
 			for k in j["meetingTimes"]:
-				print(k)
 				if k["meetingModeCode"] == "90" or k["meetingModeCode"] == "19" or k["meetingModeCode"] == "03" \
 				  or k["startTime"] == None or k["buildingCode"] == None or k["roomNumber"] == None \
 				  or k["buildingCode"] + '-' + k["roomNumber"] not in roomcodes:

@@ -7,5 +7,5 @@ Accessible at http://ru-interested.herokuapp.com
 1. git clone https://github.com/rpatel3001/RU-Interested.git
 2. pip install -r requirements.txt
 3. python scrape.py
-4. ./run
+4. gunicorn serve:app
 5. go to localhost:8000 in a browser
