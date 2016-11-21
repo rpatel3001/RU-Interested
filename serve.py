@@ -30,8 +30,8 @@ app.secret_key = "dsvasdvavasverbijbiujrenv0982ygf7328ibh"
 
 cur.execute("SELECT * FROM rooms")
 temp = cur.fetchall()
-rooms = [dict(zip(("building","campus","code", "capacity", "bcode"),t)) for t in temp]
-buildings = set([(x["building"], x["bcode"]) for x in rooms])
+rooms = [dict(zip(("building","campus", "buildingcode", "roomnum", "capacity"),t)) for t in temp]
+buildings = set([(x["building"], x["buildingcode"]) for x in rooms])
 buildings = [{"name":x[0], "code":x[1]} for x in buildings]
 
 cur.execute("SELECT * FROM departments")
