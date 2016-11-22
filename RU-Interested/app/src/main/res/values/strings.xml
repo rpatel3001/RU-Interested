@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">RU-Interested</string>
+    <string name="app_name">RU Interested</string>
     <string-array name="campusnames">
         <item>BUS</item>
         <item>LIV</item>

@@ -60,7 +60,7 @@ def get_departments():
 
 @app.route('/api')
 def info():
-	return send_file('static/api_info.html')
+	return render_template("api_info.html")
 
 @app.route('/api/buildings')
 def send_buildings():
