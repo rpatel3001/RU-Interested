@@ -1,4 +1,11 @@
 <resources>
+    <string name="searchpage">ca-app-pub-3940256099942544/6300978111</string>
+    <string name="resultpage">ca-app-pub-3940256099942544/6300978111</string>
+    <!--
+    <string name="searchpage">ca-app-pub-1628293715278100/6146078876</string>
+    <string name="resultpage">ca-app-pub-1628293715278100/7622812076</string>
+    -->
+
     <string name="app_name">RU Interested</string>
     <string-array name="campusnames">
         <item>BUS</item>

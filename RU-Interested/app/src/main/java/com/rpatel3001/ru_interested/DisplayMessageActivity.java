@@ -9,6 +9,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -19,11 +23,18 @@ import java.net.URL;
 import java.util.Scanner;
 
 public class DisplayMessageActivity extends AppCompatActivity {
+    AdView adView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_display_message);
+
+        MobileAds.initialize(getApplicationContext(), "ca-app-pub-1628293715278100~4669345675");
+        adView = (AdView) findViewById(R.id.resultads);
+        //AdRequest adRequest = new AdRequest.Builder().build();
+        AdRequest adRequest = new AdRequest.Builder().addTestDevice("AD8F1BF16DA6FCB5458ACA1CCDD92A6B").build();
+        adView.loadAd(adRequest);
 
         new DownloadWebpageTask().execute(getIntent().getStringExtra("params"));
     }
@@ -64,5 +75,29 @@ public class DisplayMessageActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
+    }
+
+    @Override
+    public void onPause() {
+        if (adView != null) {
+            adView.pause();
+        }
+        super.onPause();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (adView != null) {
+            adView.resume();
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        if (adView != null) {
+            adView.destroy();
+        }
+        super.onDestroy();
     }
 }
