@@ -4,16 +4,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import static android.widget.Toast.LENGTH_SHORT;
 
 public class MainActivity extends AppCompatActivity {
-    public final static String EXTRA_MESSAGE = "com.example.myfirstapp.MESSAGE";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -30,9 +30,14 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
         Intent intent = new Intent(this, DisplayMessageActivity.class);
-        EditText editText = (EditText) findViewById(R.id.edit_message);
-        String message = editText.getText().toString();
-        intent.putExtra(EXTRA_MESSAGE, message);
+        String campus = ((Spinner)findViewById(R.id.campus)).getSelectedItem().toString();
+        String day = ((Spinner) findViewById(R.id.day)).getSelectedItem().toString();
+        int start = Integer.parseInt(((Spinner) findViewById(R.id.starttime)).getSelectedItem().toString());
+        int end = Integer.parseInt(((Spinner) findViewById(R.id.endtime)).getSelectedItem().toString());
+        String buildings = ((EditText) findViewById(R.id.buildings)).getText().toString();
+        String departments = ((EditText) findViewById(R.id.departments)).getText().toString();
+        String message = "http://ru-interested.herokuapp.com/api/classes/" + campus + "/" + day + "/" + start + "/" + end + "?buildings=" + buildings + "&departments=" + departments;
+        intent.putExtra("params", message);
         startActivity(intent);
     }
 }
