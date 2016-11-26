@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
         int end = Integer.parseInt(((Spinner) findViewById(R.id.endtime)).getSelectedItem().toString());
         String buildings = ((EditText) findViewById(R.id.buildings)).getText().toString();
         String departments = ((EditText) findViewById(R.id.departments)).getText().toString();
-        String message = "http://ru-interested.herokuapp.com/api/classes/" + campus + "/" + day + "/" + start + "/" + end + "?buildings=" + buildings + "&departments=" + departments;
+        String message = "http://www.rajanpatel.net/api/classes/" + campus + "/" + day + "/" + start + "/" + end + "?buildings=" + buildings + "&departments=" + departments;
         intent.putExtra("params", message);
         startActivity(intent);
     }
