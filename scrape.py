@@ -25,7 +25,7 @@ if os.environ.get('HEROKU'):
 	    port=url.port
 	)
 else:
-	conn = psycopg2.connect("dbname=DATABASE user=postgres")
+	conn = psycopg2.connect("dbname=database user=postgres")
 cur = conn.cursor()
 
 
