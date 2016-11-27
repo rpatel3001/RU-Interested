@@ -1,6 +1,6 @@
 # RU-Interested
 Got a long wait between classes? See if there's an interesting lecture going on near you!
-Accessible at http://ru-interested.herokuapp.com
+Accessible at http://ru-interested.herokuapp.com or https://www.rajanpatel.net/ru-interested
 
 =================================
 
