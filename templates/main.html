@@ -8,7 +8,7 @@
 
   {% include 'header.html' %}
 
-    <form action="" method="post" name="submit">
+    <form action="#" method="post" name="submit">
       <p>Ctrl-Click to deselect or select multiple options</p>
       <p>
         {{ form.campus(size=1, **{"style":"vertical-align:top;", "onchange":"document.submit.submit();"})}}
@@ -21,14 +21,13 @@
     </form>
     <table>
       {% for course in results %}
-         <tr>
+         <tr style="padding:10;">
             <td style="padding:20;">{{course["title"]}}</td>
             <td style="padding:20;">{{course["deptcode"]}}:{{course["coursecode"]}}</td>
             <td style="padding:20;">{{course["time"]}}</td>
             <td style="padding:20;">{{course["building"]}}-{{course["room"]}}</td>
             <td style="padding:20;">{{course["department"]}}</td>
          </tr>
-         <tr height="20"></tr>
       {% endfor %}
     </table>
   </body>
