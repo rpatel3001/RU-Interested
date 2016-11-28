@@ -6,6 +6,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Spinner;
@@ -14,16 +15,23 @@ import android.widget.Toast;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 
 import static android.widget.Toast.LENGTH_SHORT;
 
 public class MainActivity extends AppCompatActivity {
     AdView adView;
+    FirebaseRemoteConfig remoteConfig;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        remoteConfig = FirebaseRemoteConfig.getInstance();
+        remoteConfig.setDefaults(R.xml.default_config);
+        remoteConfig.fetch(60);
+        remoteConfig.activateFetched();
 
         MobileAds.initialize(getApplicationContext(), "ca-app-pub-1628293715278100~4669345675");
         adView = (AdView) findViewById(R.id.searchads);
@@ -41,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
             toast.show();
             return;
         }
+
         Intent intent = new Intent(this, DisplayMessageActivity.class);
         String campus = ((Spinner) findViewById(R.id.campus)).getSelectedItem().toString();
         String day = ((Spinner) findViewById(R.id.day)).getSelectedItem().toString();
@@ -48,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
         int end = Integer.parseInt(((Spinner) findViewById(R.id.endtime)).getSelectedItem().toString());
         String buildings = ((EditText) findViewById(R.id.buildings)).getText().toString();
         String departments = ((EditText) findViewById(R.id.departments)).getText().toString();
-        String message = "http://www.rajanpatel.net/api/classes/" + campus + "/" + day + "/" + start + "/" + end + "?buildings=" + buildings + "&departments=" + departments;
+        String message = remoteConfig.getString("baseURL") + campus + "/" + day + "/" + start + "/" + end + "?buildings=" + buildings + "&departments=" + departments;
         intent.putExtra("params", message);
         startActivity(intent);
     }
