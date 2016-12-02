@@ -1,5 +1,6 @@
 from flask import *
 from flask_wtf import FlaskForm
+from flask_bootstrap import Bootstrap
 from wtforms import SelectField, SelectMultipleField
 from wtforms.validators import DataRequired
 from datetime import datetime
@@ -27,6 +28,7 @@ cur = conn.cursor()
 
 app = Flask(__name__)
 app.secret_key = "dsvasdvavasverbijbiujrenv0982ygf7328ibh"
+Bootstrap(app)
 
 cur.execute("SELECT * FROM rooms")
 temp = cur.fetchall()

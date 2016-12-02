@@ -1,10 +1,12 @@
+{%- extends "base.html" %}
+
 <!doctype html>
 <html>
   <head>
     <title>RU Interested</title>
-    {% include 'head.html' %}
   </head>
   <body>
+  {% block content %}
 
   {% include 'header.html' %}
 
@@ -19,6 +21,7 @@
         {{ form.building(size=10,**{"style":"vertical-align:top;", "onchange":"document.submit.submit();"})}}
       </p>
     </form>
+
     <table>
       {% for course in results %}
          <tr style="border-bottom: transparent 20px;">
@@ -30,5 +33,6 @@
          </tr>
       {% endfor %}
     </table>
+  {% endblock %}
   </body>
 </html>
