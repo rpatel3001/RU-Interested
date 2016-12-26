@@ -59,7 +59,6 @@ for i in range(len(rooms)):
 	cur.execute("INSERT INTO rooms VALUES (%s, %s, %s, %s, %s)", res)
 conn.commit()
 
-
 print('scraping department information')
 subjects = requests.get('http://sis.rutgers.edu/soc/init.json').json()["subjects"]
 
@@ -72,7 +71,7 @@ conn.commit()
 
 print('scraping class information')
 url = "http://sis.rutgers.edu/soc/courses.json"
-specs = {"semester" : "92016", "campus" : "NB", "level" : "U", "subject" : ""}
+specs = {"semester" : "12017", "campus" : "NB", "level" : "U", "subject" : ""}
 busch = []
 livi = []
 cookdoug = []
