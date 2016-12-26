@@ -41,6 +41,7 @@ temp = cur.fetchall()
 departments = [dict(zip(("name","code"),t)) for t in temp]
 
 def get_classes(campus, day, start, end, reqb=[''], reqs=['']):
+	print("get classes")
 	cur.execute("SELECT * FROM classes WHERE time BETWEEN %s AND %s AND campus = %s AND day = %s ", (start, end, campus, day))
 	temp = cur.fetchall()
 	classes = [dict(zip(("title","room","department","day","time","building","deptcode","coursecode","campus"),r)) for r in temp]
@@ -55,29 +56,36 @@ def get_classes(campus, day, start, end, reqb=[''], reqs=['']):
 	return classes
 
 def get_buildings():
+	print("get buildings")
 	return buildings
 
 def get_departments():
+	print("get departments")
 	return departments
 
 @app.route('/api')
 def info():
+	print("api")
 	return render_template("api_info.html")
 
 @app.route('/api/buildings')
 def send_buildings():
+	print("send buildings")
 	return jsonify(get_buildings())
 
 @app.route('/api/departments')
 def send_departments():
+	print("send departments")
 	return jsonify(get_departments())
 
 @app.route('/api/classes/<string:campus>/<string:day>/<int:start>/<int:end>', methods=['GET'])
 def send_classes(campus, day, start, end):
+	print("send classes")
 	return jsonify(get_classes(campus, day, start, end, request.args.get('buildings', default="").split(','), request.args.get('departments', default="").split(',')))
 
 @app.route('/', methods=['GET', 'POST'])
 def submit():
+	print("submit")
 	form = SpecifierForm()
 	if not form.building.data:
 		form.building.data = ['']
