@@ -22,6 +22,14 @@
     </form>
 
     <table>
+      <tr>
+        <th style="padding:20;">title</td>
+        <th style="padding:20;">coursecode</td>
+        <th style="padding:20;">startTime</td>
+        <th style="padding:20;">endTime</td>
+        <th style="padding:20;">room</td>
+        <th style="padding:20;">department</td>
+      </tr>
       {% for course in results %}
          <tr style="border-bottom: transparent 20px;">
             <td style="padding:20;">{{course["title"]}}</td>
