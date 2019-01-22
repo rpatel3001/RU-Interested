@@ -1,12 +1,13 @@
 from flask import *
 from flask_wtf import FlaskForm
 from flask_bootstrap import Bootstrap
-from wtforms import SelectField, SelectMultipleField
-from wtforms.validators import DataRequired
+from wtforms import validators, TextField, IntegerField, SubmitField, SelectField, SelectMultipleField
 from datetime import datetime
 import psycopg2
 import os
 import urllib.parse as urlparse
+import subprocess
+import time
 
 daysOfWeek = ["M","M","T","W","TH","F","S"]
 
@@ -41,51 +42,49 @@ temp = cur.fetchall()
 departments = [dict(zip(("name","code"),t)) for t in temp]
 
 def get_classes(campus, day, start, end, reqb=[''], reqs=['']):
-	print("get classes")
-	cur.execute("SELECT * FROM classes WHERE time BETWEEN %s AND %s AND campus = %s AND day = %s ", (start, end, campus, day))
+	cur.execute("SELECT * FROM courses WHERE starttime BETWEEN %s AND %s AND campus = %s AND day = %s ", (start, end, campus, day))
 	temp = cur.fetchall()
-	classes = [dict(zip(("title","room","department","day","time","building","deptcode","coursecode","campus"),r)) for r in temp]
+	classes = [dict(zip(("title","room","department","day","startTime","endTime", "building","deptcode","coursecode","campus"),r)) for r in temp]
 	classes = [x for x in classes if (reqs == [''] or x["deptcode"] in reqs) and (reqb == [''] or x["building"] in reqb)]
 	for c in classes:
-		if c["time"] > 1300:
-			c["time"] = str(c["time"]-1200)
-			c["time"] = c["time"][:-2] + ":" + c["time"][-2:] + " PM"
+		if c["startTime"] > 1300:
+			c["startTime"] = str(c["startTime"]-1200)
+			c["startTime"] = c["startTime"][:-2] + ":" + c["startTime"][-2:] + " PM"
 		else:
-			c["time"] = str(c["time"])
-			c["time"] = c["time"][:-2] + ":" + c["time"][-2:] + " AM"
+			c["startTime"] = str(c["startTime"])
+			c["startTime"] = c["startTime"][:-2] + ":" + c["startTime"][-2:] + " AM"
+		if c["endTime"] > 1300:
+			c["endTime"] = str(c["endTime"]-1200)
+			c["endTime"] = c["endTime"][:-2] + ":" + c["endTime"][-2:] + " PM"
+		else:
+			c["endTime"] = str(c["endTime"])
+			c["endTime"] = c["endTime"][:-2] + ":" + c["endTime"][-2:] + " AM"
 	return classes
 
 def get_buildings():
-	print("get buildings")
 	return buildings
 
 def get_departments():
-	print("get departments")
 	return departments
 
 @app.route('/api')
 def info():
-	print("api")
 	return render_template("api_info.html")
 
 @app.route('/api/buildings')
 def send_buildings():
-	print("send buildings")
 	return jsonify(get_buildings())
 
 @app.route('/api/departments')
 def send_departments():
-	print("send departments")
 	return jsonify(get_departments())
 
 @app.route('/api/classes/<string:campus>/<string:day>/<int:start>/<int:end>', methods=['GET'])
 def send_classes(campus, day, start, end):
-	print("send classes")
 	return jsonify(get_classes(campus, day, start, end, request.args.get('buildings', default="").split(','), request.args.get('departments', default="").split(',')))
 
 @app.route('/', methods=['GET', 'POST'])
 def submit():
-	print("submit")
 	form = SpecifierForm()
 	if not form.building.data:
 		form.building.data = ['']
@@ -113,3 +112,21 @@ class SpecifierForm(FlaskForm):
 	day = SelectField('startTime', choices=[("M", "Monday"),("T", "Tuesday"),("W", "Wednesday"),("TH", "Thursday"),("F", "Friday"),("S","Saturday")], default=currDay);
 	startTime = SelectField('startTime', choices=times, default=currTime);
 	endTime = SelectField('endTime', choices=times, default=currTime+130);
+
+
+@app.route('/updateblog', methods=['POST'])
+def updateblog():
+	subprocess.run(['rm', '-rf', 'output'], cwd='/opt/blog')
+	subprocess.run(['git', 'pull'], cwd='/opt/blog')
+	subprocess.run(['sudo', 'chown', '-R', 'rajan:rajan', '.'], cwd='/opt/blog')
+	try:
+		res = subprocess.check_output(['/usr/local/bin/pelican', '-vD', 'content'], cwd='/opt/blog')
+		return res
+	except CalledProcessError as e:
+		return e.output
+
+
+def flash_errors(form):
+    for field, errors in form.errors.items():
+        for error in errors:
+            flash(u"%s error - %s" % (getattr(form, field).label.text, error))
