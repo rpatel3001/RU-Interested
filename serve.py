@@ -115,15 +115,15 @@ class SpecifierForm(FlaskForm):
 
 @app.route('/api/esp_report', methods=['POST'])
 def esp_report():
-	data = (float(request.values['temp']), float(request.values['hum']), float(request.values['pres']), float(request.values['down_speed']))
-	cur.execute("INSERT INTO esp_data (temp, hum, pres, down_speed) VALUES (%f, %f, %f, %f)"%data)
+	data = (float(request.values['temp']), float(request.values['hum']), float(request.values['pres']))
+	cur.execute("INSERT INTO esp_data (temp, hum, pres) VALUES (%f, %f, %f)"%data)
 	conn.commit()
 	return jsonify(success=True)
 
 @app.route('/api/esp_view')
 def esp_view():
 	cur.execute("SELECT * FROM esp_data WHERE time > (NOW() - INTERVAL '1 DAY') ORDER BY id DESC")
-	ret = [dict(zip(['id', 'time', 'temp', 'hum', 'pres', 'down_speed'], x)) for x in cur.fetchall()][::-1]
+	ret = [dict(zip(['id', 'time', 'temp', 'hum', 'pres'], x)) for x in cur.fetchall()][::-1]
 	ids = [r['id'] for r in ret]
 	temps = [r['temp'] for r in ret]
 	hums = [r['hum'] for r in ret]

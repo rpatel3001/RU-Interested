@@ -1,0 +1,155 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="refresh" content="10" />
+  <meta charset="utf-8" />
+  <title>ESP32 Reports</title>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.js'></script>
+</head>
+
+<body style="background-color:#111;color: white">
+  <center>
+    <h1>ESP32 Reports</h1>
+Last report:<br/>
+{{ temp|last }} deg F<br/>
+{{ hum|last }} % RH<br/>
+{{ pres|last }} kPa<br/>
+    <canvas id="temp" width="600" height="400"></canvas>
+    <canvas id="hum"" width="600" height="400"></canvas>
+    <canvas id="pres" width="600" height="400"></canvas>
+    <canvas id="speed" width="600" height="400"></canvas>
+    <script>
+      var temp_cfg = {
+        type: 'line',
+        data: {
+          labels : [
+            {% for item in labels %}
+              "{{ item }}",
+            {% endfor %}
+          ],
+          datasets : [{
+            label: 'Temperature',
+            fill: false,
+            backgroundColor: '#f00',
+            borderColor: '#f00',
+            yAxisID: 'temp',
+            data : [
+              {% for item in temp %}
+                {{ item }},
+              {% endfor %}
+            ],
+          }, {
+            label: 'Humidity',
+            fill: false,
+            backgroundColor: '#00f',
+            borderColor: '#00f',
+            yAxisID: 'hum',
+            data : [
+              {% for item in hum %}
+                {{ item }},
+              {% endfor %}
+            ],            
+          }, {
+            label: 'Pressure',
+            fill: false,
+            backgroundColor: '#0f0',
+            borderColor: '#0f0',
+            yAxisID: 'pres',
+            data : [
+              {% for item in pres %}
+                {{ item }},
+              {% endfor %}
+            ],            
+          }]
+        },
+        options: {
+          animation: false,
+          responsive: true,
+          title: {
+            display: true,
+            text: 'Temperature'
+          },
+          scales: {
+            xAxes: [{
+              display: true,
+              type: 'time',
+              time: {
+                minUnit: 'minute'
+              },
+              gridLines: {
+                color: '#444'
+              },
+              scaleLabel: {
+                display: true,
+                labelString: 'Time'
+              }
+            }],
+            yAxes: [{
+              id: 'temp',
+              type: 'linear',
+              display: true,
+              ticks: {
+                min: 50,
+                max: 100,
+                stepSize: 5,
+                fontColor: '#f00',
+              },
+              gridLines: {
+                color: '#444'
+              },
+              scaleLabel: {
+                fontColor: '#f00',
+                display: true,
+                labelString: 'Temperature (Degrees Fahrenheit)'
+              }
+            }, {
+              id: 'hum',
+              type: 'linear',
+              display: true,
+              ticks: {
+                min: 0,
+                max: 100,
+                stepSize: 10,
+                fontColor: '#00f',
+              },
+              gridLines: {
+                color: '#444'
+              },
+              scaleLabel: {
+                fontColor: '#00f',
+                display: true,
+                labelString: 'Humidity (% Relative Humidity)'
+              }
+            }, {
+              id: 'pres',
+              type: 'linear',
+              display: true,
+              ticks: {
+                min: 95,
+                max: 105,
+                stepSize: 1,
+                fontColor: '#0f0',
+              },
+              gridLines: {
+                color: '#444'
+              },
+              scaleLabel: {
+                fontColor: '#0f0',
+                display: true,
+                labelString: 'Pressure (Kilopascals)'
+              }
+            }]
+          }
+        }
+      }
+      window.onload = function() {
+        Chart.defaults.global.defaultFontSize = 18;
+        Chart.defaults.global.defaultFontColor = '#ccc';
+        var temp_ctx = document.getElementById('temp').getContext('2d');
+        window.tempLine = new Chart(temp_ctx, temp_cfg);
+      };
+    </script>
+  </center>
+</body>
+</html>
