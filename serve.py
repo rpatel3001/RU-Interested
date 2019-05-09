@@ -113,12 +113,31 @@ class SpecifierForm(FlaskForm):
 	startTime = SelectField('startTime', choices=times, default=currTime);
 	endTime = SelectField('endTime', choices=times, default=currTime+130);
 
+@app.route('/api/esp_report', methods=['POST'])
+def esp_report():
+	data = (float(request.values['temp']), float(request.values['hum']), float(request.values['pres']), float(request.values['down_speed']))
+	cur.execute("INSERT INTO esp_data (temp, hum, pres, down_speed) VALUES (%f, %f, %f, %f)"%data)
+	conn.commit()
+	return jsonify(success=True)
 
-@app.route('/updateblog', methods=['POST'])
+@app.route('/api/esp_view')
+def esp_view():
+	cur.execute("SELECT * FROM esp_data WHERE time > (NOW() - INTERVAL '1 DAY') ORDER BY id DESC")
+	ret = [dict(zip(['id', 'time', 'temp', 'hum', 'pres', 'down_speed'], x)) for x in cur.fetchall()][::-1]
+	ids = [r['id'] for r in ret]
+	temps = [r['temp'] for r in ret]
+	hums = [r['hum'] for r in ret]
+	press = [r['pres'] for r in ret]
+	for r in ret:
+		r['time'] = r['time'].strftime("%Y-%m-%dT%H:%M:%S")
+	times = [r['time'] for r in ret]
+	return render_template('esp_view.html', labels=times, temp=temps, hum=hums, pres=press)
+
+@app.route('/api/updateblog', methods=['POST'])
 def updateblog():
-	subprocess.run(['rm', '-rf', 'output'], cwd='/opt/blog')
-	subprocess.run(['git', 'pull'], cwd='/opt/blog')
-	subprocess.run(['sudo', 'chown', '-R', 'rajan:rajan', '.'], cwd='/opt/blog')
+	subprocess.call(['rm', '-rf', 'output'], cwd='/opt/blog')
+	subprocess.call(['git', 'pull'], cwd='/opt/blog')
+	subprocess.call(['sudo', 'chown', '-R', 'rajan:rajan', '.'], cwd='/opt/blog')
 	try:
 		res = subprocess.check_output(['/usr/local/bin/pelican', '-vD', 'content'], cwd='/opt/blog')
 		return res
