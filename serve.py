@@ -120,18 +120,19 @@ def esp_report():
 	conn.commit()
 	return jsonify(success=True)
 
-@app.route('/api/esp_view')
-def esp_view():
+@app.route('/api/esp_data')
+def esp_data():
 	cur.execute("SELECT * FROM esp_data WHERE time > (NOW() - INTERVAL '1 DAY') ORDER BY id DESC")
 	ret = [dict(zip(['id', 'time', 'temp', 'hum', 'pres'], x)) for x in cur.fetchall()][::-1]
-	ids = [r['id'] for r in ret]
 	temps = [r['temp'] for r in ret]
 	hums = [r['hum'] for r in ret]
 	press = [r['pres'] for r in ret]
-	for r in ret:
-		r['time'] = r['time'].strftime("%Y-%m-%dT%H:%M:%S")
-	times = [r['time'] for r in ret]
-	return render_template('esp_view.html', labels=times, temp=temps, hum=hums, pres=press)
+	times = [r['time'].strftime("%Y-%m-%dT%H:%M:%S") for r in ret]
+	return jsonify(times=times, temps=temps, hums=hums, press=press)
+
+@app.route('/api/esp_view')
+def esp_view():
+	return render_template('esp_view.html')
 
 @app.route('/api/updateblog', methods=['POST'])
 def updateblog():
