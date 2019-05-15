@@ -25,12 +25,11 @@ if os.environ.get('HEROKU'):
 else:
 	conn = psycopg2.connect("dbname=database user=postgres")
 
-cur = conn.cursor()
-
 app = Flask(__name__)
 app.secret_key = "dsvasdvavasverbijbiujrenv0982ygf7328ibh"
 Bootstrap(app)
 
+cur = conn.cursor()
 cur.execute("SELECT * FROM rooms")
 temp = cur.fetchall()
 rooms = [dict(zip(("building","campus", "buildingcode", "roomnum", "capacity"),t)) for t in temp]
@@ -42,8 +41,9 @@ temp = cur.fetchall()
 departments = [dict(zip(("name","code"),t)) for t in temp]
 
 def get_classes(campus, day, start, end, reqb=[''], reqs=['']):
-	cur.execute("SELECT * FROM courses WHERE starttime BETWEEN %s AND %s AND campus = %s AND day = %s ", (start, end, campus, day))
-	temp = cur.fetchall()
+	c = conn.cursor()
+	c.execute("SELECT * FROM courses WHERE starttime BETWEEN %s AND %s AND campus = %s AND day = %s ", (start, end, campus, day))
+	temp = c.fetchall()
 	classes = [dict(zip(("title","room","department","day","startTime","endTime", "building","deptcode","coursecode","campus"),r)) for r in temp]
 	classes = [x for x in classes if (reqs == [''] or x["deptcode"] in reqs) and (reqb == [''] or x["building"] in reqb)]
 	for c in classes:
@@ -115,16 +115,18 @@ class SpecifierForm(FlaskForm):
 
 @app.route('/api/esp_report', methods=['POST'])
 def esp_report():
+	c = conn.cursor()
 	data = (float(request.values['temp']), float(request.values['hum']), float(request.values['pres']))
-	cur.execute("INSERT INTO esp_data (temp, hum, pres) VALUES (%f, %f, %f)"%data)
+	c.execute("INSERT INTO esp_data (temp, hum, pres) VALUES (%f, %f, %f)"%data)
 	conn.commit()
 	return jsonify(success=True)
 
 @app.route('/api/esp_data')
 def esp_data():
+	c = conn.cursor()
 	interval = int(request.values.get('interval', 2))
-	cur.execute("SELECT * FROM esp_data WHERE time > (NOW() - INTERVAL '%d HOURS') ORDER BY id DESC"%interval)
-	ret = [dict(zip(['id', 'time', 'temp', 'hum', 'pres'], x)) for x in cur.fetchall()][::-1]
+	c.execute("SELECT * FROM esp_data WHERE time > (NOW() - INTERVAL '%d HOURS') ORDER BY id DESC"%interval)
+	ret = [dict(zip(['id', 'time', 'temp', 'hum', 'pres'], x)) for x in c.fetchall()][::-1]
 	temps = [r['temp'] for r in ret]
 	hums = [r['hum'] for r in ret]
 	press = [r['pres'] for r in ret]
