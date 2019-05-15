@@ -24,6 +24,7 @@
           labels : [],
           datasets : [{
             label: 'Temperature',
+            lineTension: 0,
             fill: false,
             backgroundColor: '#f00',
             borderColor: '#f00',
@@ -31,6 +32,7 @@
             data : [],
           }, {
             label: 'Humidity',
+            lineTension: 0,
             fill: false,
             backgroundColor: '#00f',
             borderColor: '#00f',
@@ -38,6 +40,7 @@
             data : [],            
           }, {
             label: 'Pressure',
+            lineTension: 0,
             fill: false,
             backgroundColor: '#0f0',
             borderColor: '#0f0',
@@ -72,9 +75,9 @@
               type: 'linear',
               display: true,
               ticks: {
-                min: 50,
-                max: 100,
-                stepSize: 5,
+                min: 60,
+                max: 80,
+                stepSize: 2,
                 fontColor: '#f00',
               },
               gridLines: {
@@ -90,9 +93,9 @@
               type: 'linear',
               display: true,
               ticks: {
-                min: 0,
-                max: 100,
-                stepSize: 10,
+                min: 25,
+                max: 75,
+                stepSize: 5,
                 fontColor: '#00f',
               },
               gridLines: {
@@ -108,9 +111,9 @@
               type: 'linear',
               display: true,
               ticks: {
-                min: 95,
-                max: 105,
-                stepSize: 1,
+                min: 29,
+                max: 31,
+                stepSize: 0.2,
                 fontColor: '#0f0',
               },
               gridLines: {
@@ -126,12 +129,28 @@
         }
       }
 
+      function getUrlVars() {
+          var vars = {};
+          var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
+              vars[key] = value;
+          });
+          return vars;
+      }
+
+      function getUrlParam(parameter, defaultvalue){
+          var urlparameter = defaultvalue;
+          if(window.location.href.indexOf(parameter) > -1){
+              urlparameter = getUrlVars()[parameter];
+              }
+          return urlparameter;
+      }
+
       function updateChart() {
-        $.getJSON('https://rajanpatel.net/api/esp_data', function(res) {
+        $.getJSON('https://rajanpatel.net/api/esp_data?interval=' + getUrlParam("interval", "2"), function(res) {
           $("#last_time").text(res.times.slice(-1)[0]);
           $("#last_temp").text(res.temps.slice(-1)[0] + " deg F");
           $("#last_hum").text(res.hums.slice(-1)[0] + "% RH");
-          $("#last_pres").text(res.press.slice(-1)[0] + " kPa");
+          $("#last_pres").text(res.press.slice(-1)[0] + " inHg");
           window.chart.data.labels = res.times;
           window.chart.data.datasets[0].data = res.temps;
           window.chart.data.datasets[1].data = res.hums;

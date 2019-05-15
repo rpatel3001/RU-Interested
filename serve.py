@@ -122,7 +122,8 @@ def esp_report():
 
 @app.route('/api/esp_data')
 def esp_data():
-	cur.execute("SELECT * FROM esp_data WHERE time > (NOW() - INTERVAL '1 DAY') ORDER BY id DESC")
+	interval = int(request.values.get('interval', 2))
+	cur.execute("SELECT * FROM esp_data WHERE time > (NOW() - INTERVAL '%d HOURS') ORDER BY id DESC"%interval)
 	ret = [dict(zip(['id', 'time', 'temp', 'hum', 'pres'], x)) for x in cur.fetchall()][::-1]
 	temps = [r['temp'] for r in ret]
 	hums = [r['hum'] for r in ret]
