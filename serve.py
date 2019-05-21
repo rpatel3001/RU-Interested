@@ -8,6 +8,7 @@ import os
 import urllib.parse as urlparse
 import subprocess
 import time
+from math import floor, ceil
 
 daysOfWeek = ["M","M","T","W","TH","F","S"]
 
@@ -121,6 +122,13 @@ def esp_report():
 	conn.commit()
 	return jsonify(success=True)
 
+def rnd(x, base):
+	mi = min(x)
+	ma = max(x)
+	mi = base * floor(float(mi) / base)
+	ma = base * ceil(float(ma) / base)
+	return [mi, ma]
+
 @app.route('/api/esp_data')
 def esp_data():
 	c = conn.cursor()
@@ -131,7 +139,12 @@ def esp_data():
 	hums = [r['hum'] for r in ret]
 	press = [r['pres'] for r in ret]
 	times = [r['time'].strftime("%Y-%m-%dT%H:%M:%S") for r in ret]
-	return jsonify(times=times, temps=temps, hums=hums, press=press)
+
+	axes = rnd(temps, 10)
+	axes += rnd(hums, 2)
+	axes += rnd(press, .5)
+
+	return jsonify(times=times, temps=temps, hums=hums, press=press, axes=axes, extra=None)
 
 @app.route('/api/esp_view')
 def esp_view():

@@ -11,11 +11,12 @@
 <body style="background-color:#111;color: white">
   <center>
     <h1>ESP32 Reports</h1>
+    Extra: <span id="extra_data"></span>:<br/>
     Last report at <span id="last_time"></span>:<br/>
     <span id="last_temp"></span><br/>
     <span id="last_hum"></span><br/>
     <span id="last_pres"></span><br/>
-    <canvas id="chart" width="600" height="400"></canvas>
+    <canvas id="chart"></canvas>
 
     <script>
       var cfg = {
@@ -75,9 +76,7 @@
               type: 'linear',
               display: true,
               ticks: {
-                min: 60,
-                max: 80,
-                stepSize: 2,
+                maxTicksLimit: 11,
                 fontColor: '#f00',
               },
               gridLines: {
@@ -93,9 +92,7 @@
               type: 'linear',
               display: true,
               ticks: {
-                min: 25,
-                max: 75,
-                stepSize: 5,
+                maxTicksLimit: 11,
                 fontColor: '#00f',
               },
               gridLines: {
@@ -111,9 +108,7 @@
               type: 'linear',
               display: true,
               ticks: {
-                min: 29,
-                max: 31,
-                stepSize: 0.2,
+                maxTicksLimit: 11,
                 fontColor: '#0f0',
               },
               gridLines: {
@@ -151,6 +146,16 @@
           $("#last_temp").text(res.temps.slice(-1)[0] + " deg F");
           $("#last_hum").text(res.hums.slice(-1)[0] + "% RH");
           $("#last_pres").text(res.press.slice(-1)[0] + " inHg");
+          $("#extra_data").text(res.extra);
+          window.chart.options.scales.yAxes[0].ticks.min = res.axes[0]
+          window.chart.options.scales.yAxes[0].ticks.max = res.axes[1]
+          window.chart.options.scales.yAxes[0].ticks.stepSize = (res.axes[1] - res.axes[0])/10
+          window.chart.options.scales.yAxes[1].ticks.min = res.axes[2]
+          window.chart.options.scales.yAxes[1].ticks.max = res.axes[3]
+          window.chart.options.scales.yAxes[1].ticks.stepSize = (res.axes[3] - res.axes[2])/10
+          window.chart.options.scales.yAxes[2].ticks.min = res.axes[4]
+          window.chart.options.scales.yAxes[2].ticks.max = res.axes[5]
+          window.chart.options.scales.yAxes[2].ticks.stepSize = (res.axes[5] - res.axes[4])/10
           window.chart.data.labels = res.times;
           window.chart.data.datasets[0].data = res.temps;
           window.chart.data.datasets[1].data = res.hums;
