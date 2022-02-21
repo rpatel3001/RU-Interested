@@ -1,11 +1,10 @@
 # RU-Interested
-Got a long wait between classes? See if there's an interesting lecture going on near you!
-Accessible at https://www.rajanpatel.net/ru-interested
+Got a long wait between classes? See if there's an interesting lecture going on near you! Filter by time, department, campus, and/or building.
 
-This project is no longer maintained and likely will not work as it relies on scraping and minor changes can break it.
+## Obsolete
+This project is no longer maintained or hosted anywhere. If forked, it likely won't work without some work as it relies on scraping and minor changes to the page format will break it.
 
-=================================
-
+## Build
 1. git clone https://github.com/rpatel3001/RU-Interested.git
 2. pip install -r requirements.txt
 3. python scrape.py
